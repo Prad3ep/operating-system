@@ -1,0 +1,131 @@
+#include<stdio.h>
+#include<string.h>
+
+struct process_Struct {
+    char process_name[30];
+    int arrival_time, burst_time, completion_time, remaining;
+}temp_Struct;
+
+void process_Queue(int no_of_process) {
+
+    int count, arrival_Time, burst_Time, quantum_time;
+    struct process_Struct process_all[no_of_process];
+    for(count = 0; count < no_of_process; count++) {
+        printf("Enter the details of Process[%d]", count+1);
+        puts("");
+        printf("Process Name : ");
+        scanf("%s", process_all[count].process_name);
+
+        printf("Arrival Time : ");
+        scanf("%d", &process_all[count].arrival_time);
+
+        printf("Burst Time : ");
+        scanf("%d", &process_all[count].burst_time);
+        puts("");
+        
+    }
+    
+        printf("Now, enter the quantum time for queue : ");
+        scanf("%d", &quantum_time);
+
+    for(count = 0; count < no_of_process; count++) {
+        for(int x = count +1; x < count; x++){
+            if(process_all[count].arrival_time > process_all[x].arrival_time) {
+                temp_Struct = process_all[count];
+                process_all[count] = process_all[x];
+                process_all[x] = temp_Struct;
+            }
+        }
+    }
+
+    
+    for(count = 0; count < no_of_process; count++) {
+        process_all[count].remaining = process_all[count].burst_time;
+        process_all[count].completion_time = 0;
+    }
+
+    int total_time, queue, round_robin[20];
+    total_time = 0;
+    queue = 0;
+    round_robin[queue] = 0;
+
+    
+    int flag, x, n, z, waiting_time = 0;
+    do {
+        for(count = 0; count < no_of_process; count++){
+            if(total_time >= process_all[count].arrival_time){
+                z = 0;
+                for(x = 0; x <= queue; x++) {
+                    if(round_robin[x] == count) {
+                        z++;
+                    }
+                }
+                if(z == 0) {
+                    queue++; 
+                    round_robin[queue] == count;
+                }
+            }
+        }
+
+        if(queue == 0) {
+            n = 0;
+        }
+        if(process_all[n].remaining == 0) {
+            n++ ;
+        }
+        if(n > queue) {
+            n = (n - 1) % queue;
+        }
+        if(n <= queue) {
+            if(process_all[n].remaining > 0) {
+                if(process_all[n].remaining < quantum_time){
+                    total_time += process_all[n].remaining;
+                    process_all[n].remaining = 0;
+                }else {
+                    total_time += quantum_time;
+                    process_all[n].remaining -= quantum_time;
+                }
+                process_all[n].completion_time = total_time;
+            }
+            n++;
+        }
+        flag = 0;
+        
+        for(count = 0; count < no_of_process; count++) {
+            if(process_all[count].remaining > 0) {
+                flag++;
+            }
+        }
+    }while(flag != 0);
+
+    printf("\n| Process Name  | Arrival Time | Burst Time | Completion Time   |\n");
+
+    for(count = 0; count < no_of_process; count++){
+        waiting_time = process_all[count].completion_time - process_all[count].burst_time - process_all[count].arrival_time;
+        printf("\n|  %s  |   %d    |   %d    |   %d   |\n", process_all[count].process_name, process_all[count].arrival_time, process_all[count].burst_time, process_all[count].completion_time);
+    }
+}
+int main(int argc, char const *argv[]) {
+    int select_queue, no_of_process;
+    puts("Please choose a queue to post your query : ");
+    puts("1. FACULTY queue.");
+    puts("2. STUDENT queue.");
+    printf("Enter the queue : ");
+    scanf("%d", &select_queue);
+
+    switch(select_queue) {
+        case 1 :
+                printf("Enter number of process for FACULTY queue : ");
+                scanf("%d", &no_of_process);                
+                process_Queue(no_of_process);  
+                break;
+        case 2 :
+                printf("Enter number of process for STUDENT queue : ");
+                scanf("%d", &no_of_process);
+                process_Queue(no_of_process);
+                break;
+        default : 
+                printf("Please select the correct option by running the program again.");
+    }
+    return 0;
+}
